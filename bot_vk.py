@@ -1,17 +1,13 @@
 import logging
 import os
 
-import django
 import vk_api as vk
+import redis
 from dotenv import load_dotenv
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from vk_api.longpoll import VkEventType, VkLongPoll
 from vk_api.utils import get_random_id
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'quiz_bot.settings')
-django.setup()
-
-from quiz.models import Question
 
 # Enable logging
 logging.basicConfig(
@@ -23,8 +19,10 @@ logger = logging.getLogger('VK_quiz_bot')
 
 
 def get_question(event, vk):
-    question = Question.objects.order_by('?')[0]
-    answer = question.answer
+    redis_db_num = os.getenv('REDIS_DB_NUM')
+    r = redis.Redis(db=redis_db_num)
+    question = r.randomkey()
+    answer = r.get(question)
 
     keyboard = VkKeyboard(one_time=True)
 
@@ -38,9 +36,9 @@ def get_question(event, vk):
         user_id=event.user_id,
         random_id=get_random_id(),
         keyboard=keyboard.get_keyboard(),
-        message=question.question_text
+        message=question.decode()
     )
-    return answer
+    return answer.decode()
 
 
 def get_right_answer(event, vk):

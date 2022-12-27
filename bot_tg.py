@@ -1,38 +1,20 @@
-import argparse
-import json
 import logging
 import os
 
-import django
+import redis
 from dotenv import load_dotenv
 from telegram import (ReplyKeyboardMarkup, Update)
 from telegram.ext import (CallbackContext,
                           CommandHandler, Filters,
                           MessageHandler, Updater)
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'quiz_bot.settings')
-django.setup()
 
-from quiz.models import Question
-
-# Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
 logger = logging.getLogger('TG_quiz_bot')
-
-
-def fill_base(file):
-    with open(file, 'r') as f:
-        quiz = json.load(f)
-    for question in quiz.keys():
-        new_question = Question.objects.create(
-            question_text=question,
-            answer=quiz[question]
-        )
-        new_question.save()
 
 
 def start(update: Update, context: CallbackContext):
@@ -50,12 +32,16 @@ def start(update: Update, context: CallbackContext):
 
 
 def get_question(update: Update, context: CallbackContext):
-    question = Question.objects.order_by('?')[0]
+    redis_db_num = os.getenv('REDIS_DB_NUM')
+    r = redis.Redis(db=redis_db_num)
+    question = r.randomkey()
+    answer = r.get(question)
+
     reply_keyboard = [['Новый вопрос'], ['Мой счет'], ['Сдаться']]
-    context.user_data['answer'] = question.answer
+    context.user_data['answer'] = answer.decode()
     context.user_data['questions_qty'] += 1
     update.message.reply_text(
-        question.question_text,
+        question.decode(),
         reply_markup=ReplyKeyboardMarkup(
             reply_keyboard, resize_keyboard=True, one_time_keyboard=True
             )
@@ -97,23 +83,9 @@ def get_score(update: Update, context: CallbackContext):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        prog='Quiz Bot',
-        description='Задаватель вопросов')
-    parser.add_argument('--fillbase',
-                        help='Заполнение базы вопросами из JSON Файла'
-                             '--fillbase filename.json',
-                        required=False)
-    args = parser.parse_args()
-
-    if args.fillbase:
-        fill_base(args.fillbase)
-        return
-
     load_dotenv()
     token = os.getenv('TG_TOKEN')
     updater = Updater(token)
-
     while True:
         try:
             dispatcher = updater.dispatcher

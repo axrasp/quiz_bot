@@ -1,4 +1,4 @@
-Django==4.1.4
 python-dotenv==0.21.0
 python-telegram-bot==13.6
 vk-api==11.9.9
+redis==4.4.0

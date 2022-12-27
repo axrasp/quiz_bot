@@ -21,24 +21,16 @@ pip install -r requirements.txt
 ```
 TG_TOKEN=5662038928:AAEm652uxCui7HdiuKu7CKl1STF3faKpW3Q
 VK_TOKEN="vk1.a.-xrccnJWctU7lAnbe9-Cx43cbBMczQMx-U9L7sWgc5JHIv_MibxSFWpgE-Gkms149mR4tbDJJaJzBZ3oDJQ6Kcu7arg3S17NpSY6MbpKFsVG8UuVP91NRoi8j9ZA0ZoLJnj4Ek0DR0_UUSPJqV-7lIEUxs0z--TjJtigMtbNa87u0KSfqTo6kPShd7k2r-o6jDst0VPNSV
+REDIS_DB_NUM=0
 ```
 
 - TG_TOKEN - Токен телеграм-бот, полученный в [BotFather](https://t.me/BotFather)
 - VK_TOKEN - [токен](https://vk.com/@articles_vk-token-groups?ysclid=lb26bno4x7379535242) из вашего сообщества VK
+- REDIS_DB_NUM - номер вашей базы данных [Redis](https://redis.io)
 
 ### Заполнение базы данных
 
-Выполните команду 
-
-```sh
-python manage.py migrate
-```
-
-Создайте суперюзера
-
-```sh
-python manage.py createsuperuser
-```
+Запустите [redis](https://redis.io/docs/getting-started/)
 
 Подготовьте ``JSON-файл`` с вопросами и ответами вида:
 
@@ -54,11 +46,10 @@ python manage.py createsuperuser
 Для заполнения базы данных, запустите скрипт командой:
 
 ```sh
-python bot_tg.py --fillbase questions.json
+python fillbase.py --file questions.json
 ```
 
 где  ``question.json`` - путь к файлу с вопросами
-
 
 
 ## Запуск TG-бота на локальном сервере
