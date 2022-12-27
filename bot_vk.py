@@ -9,12 +9,6 @@ from vk_api.longpoll import VkEventType, VkLongPoll
 from vk_api.utils import get_random_id
 
 
-# Enable logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-
 logger = logging.getLogger('VK_quiz_bot')
 
 
@@ -99,7 +93,7 @@ def main():
     question_qty = 0
     answer = ''
 
-    logger.info('Запускаю бот')
+    logger.setLevel(logging.WARNING)
 
     while True:
         try:

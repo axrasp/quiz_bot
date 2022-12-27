@@ -9,11 +9,6 @@ from telegram.ext import (CallbackContext,
                           MessageHandler, Updater)
 
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-
 logger = logging.getLogger('TG_quiz_bot')
 
 
@@ -86,6 +81,9 @@ def main():
     load_dotenv()
     token = os.getenv('TG_TOKEN')
     updater = Updater(token)
+
+    logger.setLevel(logging.WARNING)
+
     while True:
         try:
             dispatcher = updater.dispatcher
