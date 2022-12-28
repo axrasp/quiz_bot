@@ -106,7 +106,6 @@ def main():
                     if event.text == "Сдаться" or event.text == "Новый вопрос":
                         question_qty += 1
                         answer = get_question(event, vk_api)
-                        print(answer)
                         continue
                     if event.text in answer:
                         score += 1
