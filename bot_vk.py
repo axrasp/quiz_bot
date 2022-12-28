@@ -89,10 +89,6 @@ def main():
     load_dotenv()
     vk_token = os.getenv('VK_TOKEN')
 
-    score = 0
-    question_qty = 0
-    answer = ''
-
     logger.setLevel(logging.WARNING)
 
     while True:
@@ -100,6 +96,10 @@ def main():
             vk_session = vk.VkApi(token=vk_token)
             vk_api = vk_session.get_api()
             longpoll = VkLongPoll(vk_session)
+
+            score = 0
+            question_qty = 0
+            answer = ''
 
             for event in longpoll.listen():
                 if event.type == VkEventType.MESSAGE_NEW and event.to_me:
