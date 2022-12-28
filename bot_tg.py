@@ -8,7 +8,6 @@ from telegram.ext import (CallbackContext,
                           CommandHandler, Filters,
                           MessageHandler, Updater)
 
-
 logger = logging.getLogger('TG_quiz_bot')
 
 
@@ -17,11 +16,13 @@ def start(update: Update, context: CallbackContext):
     context.user_data['questions_qty'] = 0
     reply_keyboard = [['Новый вопрос'], ['Мой счет']]
     update.message.reply_text(
-        'Добро пожаловать в Задавалку!\n'
-        'Я задаю хитрые вопросы, а ты попробуй на них ответить.\n\n'
-        'Приступим?',
+        '''Добро пожаловать в Задавалку!
+        Я задаю хитрые вопросы, а ты попробуй на них ответить.\n\n'
+        Приступим?''',
         reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard, resize_keyboard=True, one_time_keyboard=True
+            reply_keyboard,
+            resize_keyboard=True,
+            one_time_keyboard=True
         ),
     )
 
@@ -38,8 +39,10 @@ def get_question(update: Update, context: CallbackContext):
     update.message.reply_text(
         question.decode(),
         reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard, resize_keyboard=True, one_time_keyboard=True
-            )
+            reply_keyboard,
+            resize_keyboard=True,
+            one_time_keyboard=True
+        )
     )
 
 
@@ -49,18 +52,22 @@ def get_answer(update: Update, context: CallbackContext):
     if reply in context.user_data['answer']:
         context.user_data['score'] += 1
         update.message.reply_text(
-            'Это верный ответ!\n\n'
-            f'Верных ответов: {context.user_data["score"]}'
-            'Играем дальше?',
+            f'''Это верный ответ!
+            Верных ответов: {context.user_data["score"]}
+            Играем дальше?''',
             reply_markup=ReplyKeyboardMarkup(
-                reply_keyboard, resize_keyboard=True, one_time_keyboard=True
+                reply_keyboard,
+                resize_keyboard=True,
+                one_time_keyboard=True
             )
         )
     else:
         update.message.reply_text(
             'Неверный ответ, попробуй еще раз!',
             reply_markup=ReplyKeyboardMarkup(
-                reply_keyboard, resize_keyboard=True, one_time_keyboard=True
+                reply_keyboard,
+                resize_keyboard=True,
+                one_time_keyboard=True
             )
         )
 
@@ -68,11 +75,13 @@ def get_answer(update: Update, context: CallbackContext):
 def get_score(update: Update, context: CallbackContext):
     reply_keyboard = [['Новый вопрос']]
     update.message.reply_text(
-        f'Вопросов задано: {context.user_data["questions_qty"]}\n'
-        f'Верных ответов: {context.user_data["score"]}\n\n\n'
-        'Играем дальше?',
+        f'''Вопросов задано: {context.user_data["questions_qty"]}
+        Верных ответов: {context.user_data["score"]}
+        Играем дальше?''',
         reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard, resize_keyboard=True, one_time_keyboard=True
+            reply_keyboard,
+            resize_keyboard=True,
+            one_time_keyboard=True
         ),
     )
 
@@ -88,7 +97,7 @@ def main():
         try:
             dispatcher = updater.dispatcher
             dispatcher.add_handler(
-                CommandHandler("start", start)
+                CommandHandler('start', start)
             )
             dispatcher.add_handler(
                 MessageHandler(Filters.regex('^(Новый вопрос)$'), get_question)

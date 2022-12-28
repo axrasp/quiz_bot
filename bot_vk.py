@@ -48,8 +48,8 @@ def get_right_answer(event, vk):
         user_id=event.user_id,
         random_id=get_random_id(),
         keyboard=keyboard.get_keyboard(),
-        message='Это правильный ответ!\n\n '
-                'Играем еще?'
+        message='''Это правильный ответ!
+        Играем еще?'''
     )
 
 
@@ -66,8 +66,8 @@ def get_wrong_answer(event, vk):
         user_id=event.user_id,
         random_id=get_random_id(),
         keyboard=keyboard.get_keyboard(),
-        message='Неверный ответ\n\n '
-                'Попытайся еще!'
+        message='''Неверный ответ
+        Попытайся еще!'''
     )
 
 
@@ -79,9 +79,9 @@ def get_score(event, vk, score, question_qty):
         user_id=event.user_id,
         random_id=get_random_id(),
         keyboard=keyboard.get_keyboard(),
-        message=f'Вопросов задано: {question_qty}\n'
-                f'Верных ответов: {score}\n\n\n'
-                'Играем дальше?',
+        message='''Вопросов задано: {question_qty}
+        Верных ответов: {score}
+        Играем дальше?''',
     )
 
 
