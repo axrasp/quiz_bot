@@ -1,5 +1,6 @@
 import logging
 import os
+import textwrap
 
 import redis
 from dotenv import load_dotenv
@@ -15,10 +16,11 @@ def start(update: Update, context: CallbackContext):
     context.user_data['score'] = 0
     context.user_data['questions_qty'] = 0
     reply_keyboard = [['Новый вопрос'], ['Мой счет']]
-    update.message.reply_text(
-        '''Добро пожаловать в Задавалку!
-        Я задаю хитрые вопросы, а ты попробуй на них ответить.\n\n'
-        Приступим?''',
+    update.message.reply_text(textwrap.dedent(
+        '''\
+        Добро пожаловать в Задавалку!
+        Я задаю хитрые вопросы, а ты попробуй на них ответить.
+        Приступим?'''),
         reply_markup=ReplyKeyboardMarkup(
             reply_keyboard,
             resize_keyboard=True,
@@ -52,9 +54,12 @@ def get_answer(update: Update, context: CallbackContext):
     if reply in context.user_data['answer']:
         context.user_data['score'] += 1
         update.message.reply_text(
-            f'''Это верный ответ!
-            Верных ответов: {context.user_data["score"]}
-            Играем дальше?''',
+            textwrap.dedent(
+                f'''\
+                Это верный ответ!
+                Верных ответов: {context.user_data["score"]}
+                Играем дальше?'''
+            ),
             reply_markup=ReplyKeyboardMarkup(
                 reply_keyboard,
                 resize_keyboard=True,
@@ -75,9 +80,11 @@ def get_answer(update: Update, context: CallbackContext):
 def get_score(update: Update, context: CallbackContext):
     reply_keyboard = [['Новый вопрос']]
     update.message.reply_text(
-        f'''Вопросов задано: {context.user_data["questions_qty"]}
-        Верных ответов: {context.user_data["score"]}
-        Играем дальше?''',
+        textwrap.dedent(
+            f'''Вопросов задано: {context.user_data["questions_qty"]}
+            Верных ответов: {context.user_data["score"]}
+            Играем дальше?'''
+        ),
         reply_markup=ReplyKeyboardMarkup(
             reply_keyboard,
             resize_keyboard=True,

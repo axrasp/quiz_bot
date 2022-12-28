@@ -1,5 +1,7 @@
 import logging
 import os
+import textwrap
+
 
 import vk_api as vk
 import redis
@@ -48,8 +50,11 @@ def get_right_answer(event, vk):
         user_id=event.user_id,
         random_id=get_random_id(),
         keyboard=keyboard.get_keyboard(),
-        message='''Это правильный ответ!
-        Играем еще?'''
+        message=textwrap.dedent(
+            '''\
+            Это правильный ответ!
+            Играем еще?'''
+        )
     )
 
 
@@ -66,8 +71,11 @@ def get_wrong_answer(event, vk):
         user_id=event.user_id,
         random_id=get_random_id(),
         keyboard=keyboard.get_keyboard(),
-        message='''Неверный ответ
-        Попытайся еще!'''
+        message=textwrap.dedent(
+                '''\
+            Неверный ответ
+            Попытайся еще!'''
+        )
     )
 
 
@@ -79,9 +87,12 @@ def get_score(event, vk, score, question_qty):
         user_id=event.user_id,
         random_id=get_random_id(),
         keyboard=keyboard.get_keyboard(),
-        message='''Вопросов задано: {question_qty}
-        Верных ответов: {score}
-        Играем дальше?''',
+        message=textwrap.dedent(
+            '''\
+            Вопросов задано: {question_qty}
+            Верных ответов: {score}
+            Играем дальше?''',
+        )
     )
 
 
