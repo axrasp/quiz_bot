@@ -14,11 +14,9 @@ from vk_api.utils import get_random_id
 logger = logging.getLogger('VK_quiz_bot')
 
 
-def get_question(event, vk, db):
-    redis_db_num = os.getenv('REDIS_DB_NUM')
-    r = redis.Redis(db=redis_db_num)
-    question = r.randomkey()
-    answer = r.get(question)
+def get_question(event, vk, redis_db):
+    question = redis_db.randomkey()
+    answer = redis_db.get(question)
 
     keyboard = VkKeyboard(one_time=True)
 
@@ -63,8 +61,7 @@ def get_wrong_answer(event, vk):
 
     keyboard.add_button('Новый вопрос', color=VkKeyboardColor.POSITIVE)
     keyboard.add_button('Мой счет', color=VkKeyboardColor.POSITIVE)
-
-    keyboard.add_line()  # Переход на вторую строку
+    keyboard.add_line()
     keyboard.add_button('Сдаться', color=VkKeyboardColor.NEGATIVE)
 
     vk.messages.send(
@@ -88,7 +85,7 @@ def get_score(event, vk, score, question_qty):
         random_id=get_random_id(),
         keyboard=keyboard.get_keyboard(),
         message=textwrap.dedent(
-            '''\
+            f'''\
             Вопросов задано: {question_qty}
             Верных ответов: {score}
             Играем дальше?''',
@@ -108,23 +105,46 @@ def main():
             vk_api = vk_session.get_api()
             longpoll = VkLongPoll(vk_session)
 
-            score = 0
-            question_qty = 0
-            answer = ''
+            redis_db_num = os.getenv('REDIS_DB_NUM')
+            db = redis.Redis(db=redis_db_num)
 
             for event in longpoll.listen():
+                if not db.exists(f'{event.from_user}_score'):
+                    db.mset(
+                        {f'{event.from_user}_score': 0}
+                    )
+                if not db.exists(f'{event.from_user}_question_qty'):
+                    db.mset(
+                        {f'{event.from_user}_question_qty': 0}
+                    )
+                score = int(
+                    db.get(f'{event.from_user}_score').decode()
+                )
+                question_qty = int(
+                    db.get(f'{event.from_user}_question_qty').decode()
+                )
+
                 if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                     if event.text == "Сдаться" or event.text == "Новый вопрос":
                         question_qty += 1
-                        answer = get_question(event, vk_api)
+                        db.mset(
+                            {f'{event.from_user}_question_qty': question_qty}
+                        )
+                        answer = get_question(event, vk_api, db)
                         continue
+
                     if event.text in answer:
                         score += 1
+                        db.mset(
+                            {f'{event.from_user}_score': score}
+                        )
                         get_right_answer(event, vk_api)
                         continue
+
                     if event.text == "Мой счет":
                         get_score(event, vk_api, score, question_qty)
                         continue
+
                     else:
                         get_wrong_answer(event, vk_api)
                         continue
