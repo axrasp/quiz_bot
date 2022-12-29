@@ -14,7 +14,7 @@ from vk_api.utils import get_random_id
 logger = logging.getLogger('VK_quiz_bot')
 
 
-def get_question(event, vk):
+def get_question(event, vk, db):
     redis_db_num = os.getenv('REDIS_DB_NUM')
     r = redis.Redis(db=redis_db_num)
     question = r.randomkey()

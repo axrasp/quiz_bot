@@ -11,7 +11,6 @@ def fill_base(file, redis_db_num):
     with open(file, 'r') as f:
         quiz = json.load(f)
     for question, answer in quiz.items():
-        print(question)
         r.mset({question: answer})
     r.bgsave()
 
