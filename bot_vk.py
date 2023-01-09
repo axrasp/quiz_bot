@@ -106,7 +106,14 @@ def main():
             longpoll = VkLongPoll(vk_session)
 
             redis_db_num = os.getenv('REDIS_DB_NUM')
-            db = redis.Redis(db=redis_db_num)
+            redis_db_host = os.getenv('REDIS_DB_HOST')
+            redis_db_port = os.getenv('REDIS_DB_PORT')
+
+            db = redis.Redis(
+                db=redis_db_num,
+                host=redis_db_host,
+                port=redis_db_port
+            )
 
             for event in longpoll.listen():
                 if not db.exists(f'{event.from_user}_score'):

@@ -13,6 +13,18 @@ logger = logging.getLogger('TG_quiz_bot')
 
 
 def start(update: Update, context: CallbackContext):
+
+    redis_db_num = os.getenv('REDIS_DB_NUM')
+    redis_db_host = os.getenv('REDIS_DB_HOST')
+    redis_db_port = os.getenv('REDIS_DB_PORT')
+
+    db = redis.Redis(
+        db=redis_db_num,
+        host=redis_db_host,
+        port=redis_db_port
+    )
+
+    context.bot_data['database'] = db
     context.user_data['score'] = 0
     context.user_data['questions_qty'] = 0
     reply_keyboard = [['Новый вопрос'], ['Мой счет']]
@@ -30,10 +42,9 @@ def start(update: Update, context: CallbackContext):
 
 
 def get_question(update: Update, context: CallbackContext):
-    redis_db_num = os.getenv('REDIS_DB_NUM')
-    r = redis.Redis(db=redis_db_num)
-    question = r.randomkey()
-    answer = r.get(question)
+    db = context.bot_data['database']
+    question = db.randomkey()
+    answer = db.get(question)
 
     reply_keyboard = [['Новый вопрос'], ['Мой счет'], ['Сдаться']]
     context.user_data['answer'] = answer.decode()
