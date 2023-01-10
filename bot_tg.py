@@ -13,18 +13,6 @@ logger = logging.getLogger('TG_quiz_bot')
 
 
 def start(update: Update, context: CallbackContext):
-
-    redis_db_num = os.getenv('REDIS_DB_NUM')
-    redis_db_host = os.getenv('REDIS_DB_HOST')
-    redis_db_port = os.getenv('REDIS_DB_PORT')
-
-    db = redis.Redis(
-        db=redis_db_num,
-        host=redis_db_host,
-        port=redis_db_port
-    )
-
-    context.bot_data['database'] = db
     context.user_data['score'] = 0
     context.user_data['questions_qty'] = 0
     reply_keyboard = [['Новый вопрос'], ['Мой счет']]
@@ -111,9 +99,22 @@ def main():
 
     logger.setLevel(logging.WARNING)
 
+    redis_db_num = os.getenv('REDIS_DB_NUM')
+    redis_db_host = os.getenv('REDIS_DB_HOST')
+    redis_db_port = os.getenv('REDIS_DB_PORT')
+
+    db = redis.Redis(
+        db=redis_db_num,
+        host=redis_db_host,
+        port=redis_db_port
+    )
+
     while True:
         try:
             dispatcher = updater.dispatcher
+
+            dispatcher.bot_data['database'] = db
+
             dispatcher.add_handler(
                 CommandHandler('start', start)
             )
